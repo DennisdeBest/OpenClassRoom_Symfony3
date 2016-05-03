@@ -1,0 +1,11 @@
+{% extends 'OCCoreBundle::layout.html.twig' %}
+
+{% block body %}
+    {% for message in app.session.flashbag.get('info') %}
+
+        <p>Message flash : {{ message }}</p>
+
+    {% endfor %}
+    {{ render(controller("OCCoreBundle:Core:lastAds")) }}
+
+{% endblock %}

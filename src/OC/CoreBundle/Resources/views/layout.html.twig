@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}
+    Homepage
+{% endblock %}</title>
+ {% block stylesheets %}
+     {# On charge le CSS de bootstrap depuis le site directement #}
+     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+ {% endblock %}
+        </head>
+<body>
+<div class="container">
+{% block body %}
+    {# On définit un sous-titre commun à toutes les pages du bundle, par exemple #}
+    <h1>Annonces</h1>
+    <hr>
+    Bienvenu sur la page d'accueil
+    {# On définit un nouveau bloc, que les vues du bundle pourront remplir #}
+    {% block ocplatform_body %}
+    {% endblock %}
+{% endblock %}
+    <footer>
+        <h3><a href={{ path('oc_core_contact')}}> Contact</a></h3>
+    </footer>
+</div>
+{% block javascripts %}
+    {# Ajoutez ces lignes JavaScript si vous comptez vous servir des fonctionnalités du bootstrap Twitter #}
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+{% endblock %}
+</body>
+</html>

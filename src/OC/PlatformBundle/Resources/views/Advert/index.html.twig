@@ -1,16 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>First Symfony Page</title>
-</head>
-<body>
-<H1>Hello {{ name }}</H1>
-<p>n d'obligatoire, mais très recommandé).</p>
- <p>   html correspond au format du contenu de notre template.
-     Ici, nous allons y mettre du code HTML, mais vous serez amené à
-     vouloir y mettre du XML ou autre : vous changerez donc cette extension. Cela permet de mieux s'y retrouver.</p>
-  <p>  twig est le format de notre template. Ici, nous utilisons Twig comme
-      moteur de templates, mais il est toujours possible d'utiliser des templates PHP.</p>
-</body>
-</html>
+{% extends "OCCoreBundle::layout.html.twig" %}
+{% block title %}
+    Accueil - {{ parent() }}
+{% endblock %}
+
+{% block ocplatform_body %}
+
+    <h2>Liste des annonces</h2>
+    <ul>
+        {% for advert in listAdverts %}
+            <li>
+                <a href="{{ path('oc_platform_view', {'id': advert.id}) }}">
+                    {{ advert.title }}
+                </a>
+                par {{ advert.author }},
+                le {{ advert.date|date('d/m/Y') }}
+            </li>
+        {% else %}
+            <li>Pas (encore !) d'annonces</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
