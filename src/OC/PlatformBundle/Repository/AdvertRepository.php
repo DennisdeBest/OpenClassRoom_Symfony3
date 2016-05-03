@@ -1,6 +1,7 @@
 <?php
 
 namespace OC\PlatformBundle\Repository;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * AdvertRepository
@@ -10,4 +11,35 @@ namespace OC\PlatformBundle\Repository;
  */
 class AdvertRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function whereCurrentYear(QueryBuilder $qb){
+        $qb->andWhere('a.date BETWEEN :start AND :end')
+            ->setParameter('start', new \DateTime(date('Y').'01-01'))
+            ->setParameter('start', new \DateTime(date('Y').'12-31'));
+    }
+
+    public function getAdvertWithApplications() {
+        $qb = $this
+            ->createQueryBuilder('a')
+            ->leftJoin('a.applications', 'app')
+            ->addSelect('app');
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function getAdvertWithCategories(array $categoryNames){
+        $qb = $this
+            ->createQueryBuilder('a')
+            ->leftJoin('a.categories', 'cat')
+            ->addSelect('cat');
+        
+        $qb->where($qb->expr()->in('cat.name', $categoryNames));
+
+        return $qb
+            ->getQuery()
+            ->getResult();
+
+    }
+
 }

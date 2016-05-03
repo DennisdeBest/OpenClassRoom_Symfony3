@@ -33,11 +33,15 @@ class AdvertController extends Controller
         $repository=$em->getRepository('OCPlatformBundle:Advert');
 
         $advert = $repository->find($id);
+        if(null === $advert){
+            throw new NotFoundHttpException("L'annonce ".$id." n'existe pas");
+        }
 
         $listApplications = $em
             ->getRepository('OCPlatformBundle:Application')
             ->findBy(array('advert' => $advert));
-        
+
+
         $listAdvertSkills = $em
             ->getRepository('OCPlatformBundle:AdvertSkill')
             ->findBy(array('advert' => $advert));
