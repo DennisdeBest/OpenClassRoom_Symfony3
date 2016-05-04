@@ -10,20 +10,7 @@ class CoreController extends Controller {
     public function indexAction(){
         return $this->render('OCCoreBundle:index:index.html.twig');
     }
-    public function lastAdsAction()
-    {
 
-        $listAdverts = array(
-            array('id' => 2, 'title' => 'Recherche développeur Symfony'),
-            array('id' => 5, 'title' => 'Mission de webmaster'),
-            array('id' => 9, 'title' => 'Offre de stage webdesigner')
-        );
-
-        return $this->render('OCCoreBundle:index:lastAds.html.twig', array(
-            'listAdverts' => $listAdverts
-        ));
-
-    }
     public function contactAction(Request $request)
     {
         $session = $request->getSession();

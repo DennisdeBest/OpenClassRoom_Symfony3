@@ -14,17 +14,27 @@ class AdvertController extends Controller
 {
     public function indexAction($page)
     {
-        // On ne sait pas combien de pages il y a
-        // Mais on sait qu'une page doit être supérieure ou égale à 1
+        $em = $this->getDoctrine()->getManager();
+
+
         if ($page < 1) {
             // On déclenche une exception NotFoundHttpException, cela va afficher
             // une page d'erreur 404 (qu'on pourra personnaliser plus tard d'ailleurs)
             throw new NotFoundHttpException('Page "'.$page.'" inexistante.');
         }
 
+        $nbPerPage = 3;
+        $listAdverts = $em->getRepository('OCPlatformBundle:Advert')->getAdverts($page, $nbPerPage);
+
+        $nbPages = ceil(count($listAdverts) / $nbPerPage);
+
+        if ($page > $nbPages) {
+            throw $this->createNotFoundException("La page ".$page." n'existe pas.");
+        }
+
         // Ici, on récupérera la liste des annonces, puis on la passera au template
         // Mais pour l'instant, on ne fait qu'appeler le template
-        return $this->render('OCPlatformBundle:Advert:index.html.twig', array('listAdverts'=>array()));
+        return $this->render('OCPlatformBundle:Advert:index.html.twig', array('listAdverts'=>$listAdverts, 'nbPages'=>$nbPages, 'page'=>$page));
     }
 
     public function viewAction($id)
@@ -166,11 +176,9 @@ class AdvertController extends Controller
 
     {
 
-        $listAdverts = array(
-            array('id' => 2, 'title' => 'Recherche développeur Symfony'),
-            array('id' => 5, 'title' => 'Mission de webmaster'),
-            array('id' => 9, 'title' => 'Offre de stage webdesigner')
-        );
+        $em = $this->getDoctrine()->getManager();
+
+        $listAdverts = $em->getRepository('OCPlatformBundle:Advert')->findLatest(3);
 
         return $this->render('OCPlatformBundle:Advert:menu.html.twig', array(
             'listAdverts' => $listAdverts
