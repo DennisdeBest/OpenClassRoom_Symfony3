@@ -4,417 +4,309 @@ namespace OC\PlatformBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+// N'oubliez pas ce use :
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * Advert
- *
  * @ORM\Table(name="oc_advert")
  * @ORM\Entity(repositoryClass="OC\PlatformBundle\Repository\AdvertRepository")
  * @ORM\HasLifecycleCallbacks()
  */
 class Advert
-    { 
-    /**
-     * @ORM\OneToMany(targetEntity="OC\PlatformBundle\Entity\Application", mappedBy="advert")
-     */
-    private $applications; // Notez le « s », une annonce est liée à plusieurs candidatures
+{
+  /**
+   * @var int
+   *
+   * @ORM\Column(name="id", type="integer")
+   * @ORM\Id
+   * @ORM\GeneratedValue(strategy="AUTO")
+   */
+  private $id;
 
+  /**
+   * @var \DateTime
+   *
+   * @ORM\Column(name="date", type="datetime")
+   */
+  private $date;
 
-    /**
-     * @ORM\OneToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"})
-     */
-    private $image;
+  /**
+   * @var string
+   *
+   * @ORM\Column(name="title", type="string", length=255)
+   */
+  private $title;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="OC\PlatformBundle\Entity\Category", cascade={"persist"})
-     * @ORM\JoinTable(name="oc_advert_category")
-     */
-    private $categories;
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    private $id;
+  /**
+   * @var string
+   *
+   * @ORM\Column(name="author", type="string", length=255)
+   */
+  private $author;
 
-    /**
-     * @ORM\Column(name="updated_at", type="datetime", nullable=true)
-     */
-    private $updatedAt;
+  /**
+   * @var string
+   *
+   * @ORM\Column(name="content", type="string", length=255)
+   */
+  private $content;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="date", type="datetime")
-     */
-    private $date;
+  /**
+   * @ORM\Column(name="published", type="boolean")
+   */
+  private $published = true;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="title", type="string", length=255)
-     */
-    private $title;
+  /**
+   * @ORM\ManyToOne(targetEntity="OC\PlatformBundle\Entity\Image", cascade={"persist"})
+   */
+  private $image;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="author", type="string", length=255)
-     */
-    private $author;
+  /**
+   * @ORM\ManyToMany(targetEntity="OC\PlatformBundle\Entity\Category", cascade={"persist"})
+   * @ORM\JoinTable(name="oc_advert_category")
+   */
+  private $categories;
 
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="content", type="text")
-     */
-    private $content;
+  /**
+   * @ORM\OneToMany(targetEntity="OC\PlatformBundle\Entity\Application", mappedBy="advert")
+   */
+  private $applications; // Notez le « s », une annonce est liée à plusieurs candidatures
 
-    /**
-     * @ORM\Column(name="published", type="boolean")
-     */
+  /**
+   * @ORM\Column(name="updated_at", type="datetime", nullable=true)
+   */
+  private $updatedAt;
 
-    private $published = true;
+  /**
+   * @ORM\Column(name="nb_applications", type="integer")
+   */
+  private $nbApplications = 0;
 
+  /**
+   * @Gedmo\Slug(fields={"title"})
+   * @ORM\Column(name="slug", type="string", length=255, unique=false)
+   */
+  private $slug;
 
-    /**
+  public function __construct()
+  {
+    $this->date         = new \Datetime();
+    $this->categories   = new ArrayCollection();
+    $this->applications = new ArrayCollection();
+  }
 
-     * @ORM\Column(name="nb_applications", type="integer")
+  /**
+   * @ORM\PreUpdate
+   */
+  public function updateDate()
+  {
+    $this->setUpdatedAt(new \Datetime());
+  }
 
-     */
+  public function increaseApplication()
+  {
+    $this->nbApplications++;
+  }
 
-    private $nbApplications = 0;
-    
-    public function increaseApplication()
-    {
-        $this->nbApplications++;
-    }
-    
-    public function decreaseApplication()
-    {
-        $this->nbApplications--;
-    }
-    
-    /**
-     * @Gedmo\Slug(fields={"title"})
-     * @ORM\Column(name="slug", type="string", length=255, unique=true)
-     */
-    private $slug;
+  public function decreaseApplication()
+  {
+    $this->nbApplications--;
+  }
 
-    
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
+  /**
+   * @return int
+   */
+  public function getId()
+  {
+    return $this->id;
+  }
 
-    /**
-     * Set date
-     *
-     * @param \DateTime $date
-     *
-     * @return Advert
-     */
-    public function setDate($date)
-    {
-        $this->date = $date;
+  /**
+   * @param \DateTime $date
+   */
+  public function setDate($date)
+  {
+    $this->date = $date;
+  }
 
-        return $this;
-    }
+  /**
+   * @return \DateTime
+   */
+  public function getDate()
+  {
+    return $this->date;
+  }
 
-    /**
-     * Get date
-     *
-     * @return \DateTime
-     */
-    public function getDate()
-    {
-        return $this->date;
-    }
+  /**
+   * @param string $title
+   */
+  public function setTitle($title)
+  {
+    $this->title = $title;
+  }
 
-    /**
-     * Set title
-     *
-     * @param string $title
-     *
-     * @return Advert
-     */
-    public function setTitle($title)
-    {
-        $this->title = $title;
+  /**
+   * @return string
+   */
+  public function getTitle()
+  {
+    return $this->title;
+  }
 
-        return $this;
-    }
+  /**
+   * @param string $author
+   */
+  public function setAuthor($author)
+  {
+    $this->author = $author;
+  }
 
-    /**
-     * Get title
-     *
-     * @return string
-     */
-    public function getTitle()
-    {
-        return $this->title;
-    }
+  /**
+   * @return string
+   */
+  public function getAuthor()
+  {
+    return $this->author;
+  }
 
-    /**
-     * Set author
-     *
-     * @param string $author
-     *
-     * @return Advert
-     */
-    public function setAuthor($author)
-    {
-        $this->author = $author;
+  /**
+   * @param string $content
+   */
+  public function setContent($content)
+  {
+    $this->content = $content;
+  }
 
-        return $this;
-    }
+  /**
+   * @return string
+   */
+  public function getContent()
+  {
+    return $this->content;
+  }
 
-    /**
-     * Get author
-     *
-     * @return string
-     */
-    public function getAuthor()
-    {
-        return $this->author;
-    }
+  /**
+   * @param bool $published
+   */
+  public function setPublished($published)
+  {
+    $this->published = $published;
+  }
 
-    /**
-     * Set content
-     *
-     * @param string $content
-     *
-     * @return Advert
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
+  /**
+   * @return bool
+   */
+  public function getPublished()
+  {
+    return $this->published;
+  }
 
-        return $this;
-    }
+  public function setImage(Image $image = null)
+  {
+    $this->image = $image;
+  }
 
-    /**
-     * Get content
-     *
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
+  public function getImage()
+  {
+    return $this->image;
+  }
 
-    public function __construct()
+  /**
+   * @param Category $category
+   */
+  public function addCategory(Category $category)
+  {
+    $this->categories[] = $category;
+  }
 
-    {
+  /**
+   * @param Category $category
+   */
+  public function removeCategory(Category $category)
+  {
+    $this->categories->removeElement($category);
+  }
 
-        // Par défaut, la date de l'annonce est la date d'aujourd'hui
+  /**
+   * @return ArrayCollection
+   */
+  public function getCategories()
+  {
+    return $this->categories;
+  }
 
-        $this->date = new \Datetime();
-        $this->categories = new ArrayCollection();
-        $this->applications = new ArrayCollection();
+  /**
+   * @param Application $application
+   */
+  public function addApplication(Application $application)
+  {
+    $this->applications[] = $application;
 
-    }
-    /**
-     * @ORM\PreUpdate
-     */
-    public function updateDate() {
-        $this->setUpdatedAt(new \DateTime());
-    }
+    // On lie l'annonce à la candidature
+    $application->setAdvert($this);
+  }
 
-    /**
-     * Set published
-     *
-     * @param boolean $published
-     *
-     * @return Advert
-     */
-    public function setPublished($published)
-    {
-        $this->published = $published;
+  /**
+   * @param Application $application
+   */
+  public function removeApplication(Application $application)
+  {
+    $this->applications->removeElement($application);
+  }
 
-        return $this;
-    }
+  /**
+   * @return \Doctrine\Common\Collections\Collection
+   */
+  public function getApplications()
+  {
+    return $this->applications;
+  }
 
-    /**
-     * Get published
-     *
-     * @return boolean
-     */
-    public function getPublished()
-    {
-        return $this->published;
-    }
+  /**
+   * @param \DateTime $updatedAt
+   */
+  public function setUpdatedAt(\Datetime $updatedAt = null)
+  {
+      $this->updatedAt = $updatedAt;
+  }
 
-    /**
-     * Set image
-     *
-     * @param \OC\PlatformBundle\Entity\Image $image
-     *
-     * @return Advert
-     */
-    public function setImage(\OC\PlatformBundle\Entity\Image $image = null)
-    {
-        $this->image = $image;
+  /**
+   * @return \DateTime
+   */
+  public function getUpdatedAt()
+  {
+      return $this->updatedAt;
+  }
 
-        return $this;
-    }
+  /**
+   * @param integer $nbApplications
+   */
+  public function setNbApplications($nbApplications)
+  {
+      $this->nbApplications = $nbApplications;
+  }
 
-    /**
-     * Get image
-     *
-     * @return \OC\PlatformBundle\Entity\Image
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
+  /**
+   * @return integer
+   */
+  public function getNbApplications()
+  {
+      return $this->nbApplications;
+  }
 
-    /**
-     * Add category
-     *
-     * @param \OC\PlatformBundle\Entity\Category $category
-     *
-     * @return Advert
-     */
-    public function addCategory(\OC\PlatformBundle\Entity\Category $category)
-    {
-        $this->categories[] = $category;
+  /**
+   * @param string $slug
+   */
+  public function setSlug($slug)
+  {
+      $this->slug = $slug;
+  }
 
-        return $this;
-    }
-
-    /**
-     * Remove category
-     *
-     * @param \OC\PlatformBundle\Entity\Category $category
-     */
-    public function removeCategory(\OC\PlatformBundle\Entity\Category $category)
-    {
-        $this->categories->removeElement($category);
-    }
-
-    /**
-     * Get categories
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getCategories()
-    {
-        return $this->categories;
-    }
-
-    /**
-     * Add application
-     *
-     * @param \OC\PlatformBundle\Entity\Application $application
-     *
-     * @return Advert
-     */
-    public function addApplication(\OC\PlatformBundle\Entity\Application $application)
-    {
-        $this->applications[] = $application;
-
-        $application->setAdvert($this);
-        return $this;
-    }
-
-    /**
-     * Remove application
-     *
-     * @param \OC\PlatformBundle\Entity\Application $application
-     */
-    public function removeApplication(\OC\PlatformBundle\Entity\Application $application)
-    {
-        $this->applications->removeElement($application);
-    }
-
-    /**
-     * Get applications
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getApplications()
-    {
-        return $this->applications;
-    }
-
-    /**
-     * Set updatedAt
-     *
-     * @param \DateTime $updatedAt
-     *
-     * @return Advert
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
-    /**
-     * Get updatedAt
-     *
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set nbApplications
-     *
-     * @param integer $nbApplications
-     *
-     * @return Advert
-     */
-    public function setNbApplications($nbApplications)
-    {
-        $this->nbApplications = $nbApplications;
-
-        return $this;
-    }
-
-    /**
-     * Get nbApplications
-     *
-     * @return integer
-     */
-    public function getNbApplications()
-    {
-        return $this->nbApplications;
-    }
-
-    /**
-     * Set slug
-     *
-     * @param string $slug
-     *
-     * @return Advert
-     */
-    public function setSlug($slug)
-    {
-        $this->slug = $slug;
-
-        return $this;
-    }
-
-    /**
-     * Get slug
-     *
-     * @return string
-     */
-    public function getSlug()
-    {
-        return $this->slug;
-    }
+  /**
+   * @return string
+   */
+  public function getSlug()
+  {
+      return $this->slug;
+  }
 }
